@@ -13,5 +13,8 @@
     "puteiro": 150,
     "motel": 150,
     "bar": 150
-  }
+  },
+
+  "canalPermitido": "",
+  "cargoAviso": ""
 }
