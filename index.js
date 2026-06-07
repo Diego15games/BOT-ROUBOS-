@@ -21,6 +21,7 @@ const client = new Client({
 
 const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
+const DONO_ID = "1134947177987330159";
 
 const DATA_FILE = './roubos.json';
 
@@ -325,6 +326,13 @@ client.on(
             interaction.commandName ===
             'painel-roubo'
         ) {
+
+            if (interaction.user.id !== DONO_ID) {
+    return interaction.reply({
+        content: '❌ Apenas diego0967 pode usar este comando.',
+        ephemeral: true
+    });
+            }
 
             const embed =
                 new EmbedBuilder()
