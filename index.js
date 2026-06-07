@@ -112,8 +112,11 @@ async function atualizarPainel() {
 
                 embed.addFields({
                     name: local.toUpperCase(),
-                    value: '🟢 Liberado'
-                });
+                    value:
+               '⏰ Disponível às: AGORA\n' +
+               '⌛ Tempo restante: 0min\n' +
+               '🟢 Liberado'
+              });
 
                 continue;
             }
@@ -125,7 +128,10 @@ async function atualizarPainel() {
 
                 embed.addFields({
                     name: local.toUpperCase(),
-                    value: '🟢 Liberado'
+                    value:
+                 '⏰ Disponível às: AGORA\n' +
+                 '⌛ Tempo restante: 0min\n' +
+                 '🟢 Liberado'
                 });
 
             } else {
@@ -133,8 +139,9 @@ async function atualizarPainel() {
                 embed.addFields({
                     name: local.toUpperCase(),
                     value:
-                        `⏰ Disponível às: ${formatarHorario(info.libera)}\n` +
-                        `⌛ Falta: ${formatarTempo(restante)}`
+                 `⏰ Disponível às: ${formatarHorario(info.libera)}\n` +
+                 `⌛ Tempo restante: ${formatarTempo(restante)}\n` +
+                 `🔴 Em cooldown`
                 });
 
             }
