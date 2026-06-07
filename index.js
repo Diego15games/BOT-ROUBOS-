@@ -65,20 +65,16 @@ function formatarTempo(ms) {
 }
 
 function formatarHorario(timestamp) {
-
-    const data = new Date(timestamp);
-
-    const hora = String(
-        data.getHours()
-    ).padStart(2, '0');
-
-    const minuto = String(
-        data.getMinutes()
-    ).padStart(2, '0');
-
-    return `${hora}:${minuto}`;
+    return new Date(timestamp).toLocaleTimeString(
+        'pt-BR',
+        {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit'
+        }
+    );
 }
-
+        
 async function atualizarPainel() {
 
     if (!dados.painel || !dados.canal) {
