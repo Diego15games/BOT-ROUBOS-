@@ -1,0 +1,360 @@
+const {
+    Client,
+    GatewayIntentBits,
+    EmbedBuilder,
+    SlashCommandBuilder,
+    REST,
+    Routes
+} = require('discord.js');
+
+const fs = require('fs');
+
+const config = require('./config.json');
+
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
+    ]
+});
+
+const TOKEN = process.env.TOKEN;
+const CLIENT_ID = process.env.CLIENT_ID;
+
+const DATA_FILE = './roubos.json';
+
+function carregarDados() {
+    try {
+        return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    } catch {
+        return {
+            painel: null,
+            canal: null,
+            roubos: {}
+        };
+    }
+}
+
+function salvarDados(dados) {
+    fs.writeFileSync(
+        DATA_FILE,
+        JSON.stringify(dados, null, 2)
+    );
+}
+
+let dados = carregarDados();
+
+function formatarTempo(ms) {
+
+    if (ms <= 0) {
+        return 'Liberado';
+    }
+
+    const minutos = Math.floor(ms / 60000);
+
+    const horas = Math.floor(minutos / 60);
+
+    const mins = minutos % 60;
+
+    if (horas > 0) {
+        return `${horas}h ${mins}min`;
+    }
+
+    return `${mins}min`;
+}
+
+function formatarHorario(timestamp) {
+
+    const data = new Date(timestamp);
+
+    const hora = String(
+        data.getHours()
+    ).padStart(2, '0');
+
+    const minuto = String(
+        data.getMinutes()
+    ).padStart(2, '0');
+
+    return `${hora}:${minuto}`;
+}
+
+async function atualizarPainel() {
+
+    if (!dados.painel || !dados.canal) {
+        return;
+    }
+
+    try {
+
+        const canal =
+            await client.channels.fetch(
+                dados.canal
+            );
+
+        const mensagem =
+            await canal.messages.fetch(
+                dados.painel
+            );
+
+        const embed =
+            new EmbedBuilder()
+                .setTitle('📋 CONTROLE DE ROUBOS')
+                .setColor('Blue')
+                .setTimestamp();
+
+        const locais = Object.keys(
+            config.cooldowns
+        );
+
+        for (const local of locais) {
+
+            const info =
+                dados.roubos[local];
+
+            if (!info) {
+
+                embed.addFields({
+                    name: local.toUpperCase(),
+                    value: '🟢 Liberado'
+                });
+
+                continue;
+            }
+
+            const restante =
+                info.libera - Date.now();
+
+            if (restante <= 0) {
+
+                embed.addFields({
+                    name: local.toUpperCase(),
+                    value: '🟢 Liberado'
+                });
+
+            } else {
+
+                embed.addFields({
+                    name: local.toUpperCase(),
+                    value:
+                        `⏰ Disponível às: ${formatarHorario(info.libera)}\n` +
+                        `⌛ Falta: ${formatarTempo(restante)}`
+                });
+
+            }
+        }
+
+        await mensagem.edit({
+            embeds: [embed]
+        });
+
+    } catch (erro) {
+        console.log(
+            'Erro ao atualizar painel:',
+            erro.message
+        );
+    }
+}
+
+async function verificarLiberacoes() {
+
+    let alterou = false;
+
+    for (const local of Object.keys(dados.roubos)) {
+
+        const info = dados.roubos[local];
+
+        if (!info) continue;
+
+        if (
+            Date.now() >= info.libera &&
+            !info.avisado
+        ) {
+
+            try {
+
+                const canal =
+                    await client.channels.fetch(
+                        dados.canal
+                    );
+
+                await canal.send(
+                    `✅ **${local.toUpperCase()}** está liberado novamente!`
+                );
+
+            } catch (erro) {
+                console.log(
+                    'Erro ao avisar:',
+                    erro.message
+                );
+            }
+
+            info.avisado = true;
+
+            alterou = true;
+        }
+    }
+
+    if (alterou) {
+        salvarDados(dados);
+    }
+
+    atualizarPainel();
+}
+
+client.on(
+    'messageCreate',
+    async (message) => {
+
+        if (message.author.bot) return;
+
+        const texto =
+            message.content
+                .trim()
+                .toLowerCase();
+
+        if (!texto.startsWith('up ')) {
+            return;
+        }
+
+        const local =
+            texto.replace('up ', '');
+
+        if (
+            !config.cooldowns[local]
+        ) {
+
+            return message.reply(
+                '❌ Local não encontrado.'
+            );
+        }
+
+        const cooldown =
+            config.cooldowns[local];
+
+        const libera =
+            Date.now() +
+            cooldown * 60000;
+
+        dados.roubos[local] = {
+            libera,
+            avisado: false
+        };
+
+        salvarDados(dados);
+
+        await atualizarPainel();
+
+        return message.reply(
+            `✅ ${local.toUpperCase()} atualizado!\n\n` +
+            `⏰ Disponível às: ${formatarHorario(libera)}`
+        );
+    }
+);
+
+setInterval(
+    verificarLiberacoes,
+    60000
+);
+
+const commands = [
+    new SlashCommandBuilder()
+        .setName('painel-roubo')
+        .setDescription(
+            'Cria o painel de roubos'
+        )
+].map(command =>
+    command.toJSON()
+);
+
+client.once(
+    'ready',
+    async () => {
+
+        console.log(
+            `${client.user.tag} online!`
+        );
+
+        try {
+
+            const rest =
+                new REST({
+                    version: '10'
+                }).setToken(TOKEN);
+
+            await rest.put(
+                Routes.applicationCommands(
+                    CLIENT_ID
+                ),
+                {
+                    body: commands
+                }
+            );
+
+            console.log(
+                'Comandos registrados.'
+            );
+
+        } catch (erro) {
+
+            console.log(
+                'Erro ao registrar comandos:',
+                erro
+            );
+
+        }
+
+        atualizarPainel();
+    }
+);
+
+client.on(
+    'interactionCreate',
+    async interaction => {
+
+        if (
+            !interaction.isChatInputCommand()
+        ) {
+            return;
+        }
+
+        if (
+            interaction.commandName ===
+            'painel-roubo'
+        ) {
+
+            const embed =
+                new EmbedBuilder()
+                    .setTitle(
+                        '📋 CONTROLE DE ROUBOS'
+                    )
+                    .setColor('Blue')
+                    .setDescription(
+                        'Painel criado com sucesso.'
+                    );
+
+            const mensagem =
+                await interaction.channel.send({
+                    embeds: [embed]
+                });
+
+            dados.painel =
+                mensagem.id;
+
+            dados.canal =
+                interaction.channel.id;
+
+            salvarDados(dados);
+
+            await atualizarPainel();
+
+            await interaction.reply({
+                content:
+                    '✅ Painel criado!',
+                ephemeral: true
+            });
+        }
+    }
+);
+
+client.login(TOKEN);

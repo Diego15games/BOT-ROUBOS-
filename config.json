@@ -1,0 +1,17 @@
+{
+  "cooldowns": {
+    "banco central": 180,
+    "banco ls": 150,
+    "navio": 150,
+    "ilha": 150,
+    "bps": 180,
+    "loja 1": 150,
+    "loja 2": 150,
+    "loja 3": 150,
+    "lot ls": 150,
+    "lot sf": 150,
+    "puteiro": 150,
+    "motel": 150,
+    "bar": 150
+  }
+}
