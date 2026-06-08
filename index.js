@@ -328,10 +328,10 @@ client.on(
         ) {
 
             if (interaction.user.id !== DONO_ID) {
-    return interaction.reply({
-        content: '❌ Apenas diego0967 pode usar este comando.',
-        ephemeral: true
-    });
+                return interaction.reply({
+                    content: '❌ Apenas o dono do bot pode usar este comando.',
+                    ephemeral: true
+                });
             }
 
             const embed =
@@ -359,9 +359,55 @@ client.on(
 
             await atualizarPainel();
 
-            await interaction.reply({
+            return interaction.reply({
                 content:
                     '✅ Painel criado!',
+                ephemeral: true
+            });
+        }
+
+        if (
+            interaction.commandName ===
+            'roubos-config'
+        ) {
+
+            if (interaction.user.id !== DONO_ID) {
+                return interaction.reply({
+                    content: '❌ Apenas o dono do bot pode usar este comando.',
+                    ephemeral: true
+                });
+            }
+
+            const canal =
+                interaction.options.getChannel(
+                    'canal'
+                );
+
+            const cargo =
+                interaction.options.getRole(
+                    'cargo'
+                );
+
+            config.canalPermitido =
+                canal.id;
+
+            config.cargoAviso =
+                cargo.id;
+
+            fs.writeFileSync(
+                './config.json',
+                JSON.stringify(
+                    config,
+                    null,
+                    2
+                )
+            );
+
+            return interaction.reply({
+                content:
+                    `✅ Configuração salva!\n\n` +
+                    `📢 Canal: ${canal}\n` +
+                    `🏷️ Cargo: ${cargo}`,
                 ephemeral: true
             });
         }
