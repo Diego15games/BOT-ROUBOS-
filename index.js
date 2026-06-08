@@ -315,7 +315,7 @@ client.once(
             );
 
             console.log(
-                'Comandos registrados.'
+                'Comandos registrados: painel-roubo e roubos-config.'
             );
 
         } catch (erro) {
