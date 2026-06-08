@@ -266,7 +266,26 @@ const commands = [
         .setName('painel-roubo')
         .setDescription(
             'Cria o painel de roubos'
+        ),
+
+    new SlashCommandBuilder()
+        .setName('roubos-config')
+        .setDescription(
+            'Configura canal e cargo'
         )
+        .addChannelOption(option =>
+            option
+                .setName('canal')
+                .setDescription('Canal dos roubos')
+                .setRequired(true)
+        )
+        .addRoleOption(option =>
+            option
+                .setName('cargo')
+                .setDescription('Cargo para avisos')
+                .setRequired(true)
+        )
+
 ].map(command =>
     command.toJSON()
 );
