@@ -315,8 +315,13 @@ client.once(
             );
 
             console.log(
-                'Comandos registrados: painel-roubo e roubos-config.'
-            );
+    'Comandos:',
+    commands.map(cmd => cmd.name)
+);
+
+console.log(
+    'Comandos registrados.'
+);
 
         } catch (erro) {
 
