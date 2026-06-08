@@ -291,7 +291,7 @@ const commands = [
 );
 
 client.once(
-    'ready',
+    ''clientReady'',
     async () => {
 
         console.log(
