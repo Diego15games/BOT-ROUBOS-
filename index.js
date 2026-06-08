@@ -183,8 +183,10 @@ async function verificarLiberacoes() {
                     );
 
                 await canal.send(
-                    `✅ **${local.toUpperCase()}** está liberado novamente!`
-                );
+    `<@&${config.cargoAviso}>\n\n` +
+    `✅ **${local.toUpperCase()}** DISPONÍVEL!\n\n` +
+    `🏦 Já pode ser roubado novamente.`
+);
 
             } catch (erro) {
                 console.log(
