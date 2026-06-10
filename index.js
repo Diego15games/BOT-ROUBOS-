@@ -214,6 +214,13 @@ client.on(
 
         if (message.author.bot) return;
 
+        if (
+    config.canalPermitido &&
+    message.channel.id !== config.canalPermitido
+) {
+    return;
+        }
+
         const texto =
             message.content
                 .trim()
@@ -403,6 +410,16 @@ client.on(
                     ephemeral: true
                 });
             }
+
+            if (
+    config.canalPermitido &&
+    interaction.channel.id !== config.canalPermitido
+) {
+    return interaction.reply({
+        content: '❌ Este comando só pode ser usado no canal configurado.',
+        ephemeral: true
+    });
+}
 
             const canal =
                 interaction.options.getChannel(
