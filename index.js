@@ -180,35 +180,32 @@ async function verificarLiberacoes() {
             !info.avisado
         ) {
 
-            try {
+            for (const painelInfo of dados.paineis) {
 
-                for (const painelInfo of dados.paineis) {
+                try {
 
-    try {
+                    const canal =
+                        await client.channels.fetch(
+                            painelInfo.canal
+                        );
 
-        const canal =
-            await client.channels.fetch(
-                painelInfo.canal
-            );
+                    await canal.send(
+                        `<@&${config.cargoAviso}>\n\n` +
+                        `✅ **${local.toUpperCase()}** DISPONÍVEL!\n\n` +
+                        `🏦 Já pode ser roubado novamente.`
+                    );
 
-        await canal.send(
-            `<@&${config.cargoAviso}>\n\n` +
-            `✅ **${local.toUpperCase()}** DISPONÍVEL!\n\n` +
-            `🏦 Já pode ser roubado novamente.`
-        );
+                } catch (erro) {
 
-    } catch (erro) {
+                    console.log(
+                        'Erro ao avisar:',
+                        erro.message
+                    );
 
-        console.log(
-            'Erro ao avisar:',
-            erro.message
-        );
-
-     }       
-}
+                }
+            }
 
             info.avisado = true;
-
             alterou = true;
         }
     }
