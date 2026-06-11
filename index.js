@@ -30,10 +30,9 @@ function carregarDados() {
         return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
     } catch {
         return {
-            painel: null,
-            canal: null,
-            roubos: {}
-        };
+    paineis: [],
+    roubos: {}
+};
     }
 }
 
@@ -392,11 +391,20 @@ const embed =
                     embeds: [embed]
                 });
 
-            dados.painel =
-                mensagem.id;
+            const painelExistente = dados.paineis.find(
+    p => p.servidor === interaction.guild.id
+);
 
-            dados.canal =
-                interaction.channel.id;
+if (painelExistente) {
+    painelExistente.painel = mensagem.id;
+    painelExistente.canal = interaction.channel.id;
+} else {
+    dados.paineis.push({
+        servidor: interaction.guild.id,
+        canal: interaction.channel.id,
+        painel: mensagem.id
+    });
+        }
 
             salvarDados(dados);
 
