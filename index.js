@@ -437,7 +437,7 @@ client.on(
             config.cargoAviso =
                 cargo.id;
 
-            console.log("Canal salvo:", canal.id)
+            console.log("Canal salvo:", canal.id);
             console.log("Cargo salvo:", cargo.id);
 
             fs.writeFileSync(
