@@ -411,6 +411,9 @@ client.on(
                 });
             }
 
+            console.log("Canal configurado:", config.canalPermitido);
+            console.log("Canal atual:", interaction.channel.id);
+
             if (
     config.canalPermitido &&
     interaction.channel.id !== config.canalPermitido
