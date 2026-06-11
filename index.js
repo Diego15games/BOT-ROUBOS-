@@ -361,14 +361,24 @@ client.on(
         ) {
 
             if (interaction.user.id !== DONO_ID) {
-                return interaction.reply({
-                    content: '❌ Apenas o dono do bot pode usar este comando.',
-                    ephemeral: true
-                });
-            }
+    return interaction.reply({
+        content: '❌ Apenas o dono do bot pode usar este comando.',
+        ephemeral: true
+    });
+}
 
-            const embed =
-                new EmbedBuilder()
+if (
+    config.canalPermitido &&
+    interaction.channel.id !== config.canalPermitido
+) {
+    return interaction.reply({
+        content: '❌ Este comando só pode ser usado no canal configurado.',
+        ephemeral: true
+    });
+}
+
+const embed =
+    new EmbedBuilder()
                     .setTitle(
                         '📋 CONTROLE DE ROUBOS'
                     )
