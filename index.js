@@ -224,8 +224,8 @@ client.on(
         if (message.author.bot) return;
 
         if (
-    config.canalPermitido &&
-    message.channel.id !== config.canalPermitido
+    config.canaisPermitidos &&
+    !config.canaisPermitidos.includes(message.channel.id)
 ) {
     return;
         }
@@ -377,8 +377,8 @@ client.on(
 }
 
 if (
-    config.canalPermitido &&
-    interaction.channel.id !== config.canalPermitido
+    config.canaisPermitidos &&
+    !config.canaisPermitidos.includes(interaction.channel.id)
 ) {
     return interaction.reply({
         content: '❌ Este comando só pode ser usado no canal configurado.',
@@ -462,9 +462,14 @@ if (painelExistente) {
                     'cargo'
                 );
 
-            config.canalPermitido =
-                canal.id;
+            if (!config.canaisPermitidos) {
+    config.canaisPermitidos = [];
+}
 
+if (!config.canaisPermitidos.includes(canal.id)) {
+    config.canaisPermitidos.push(canal.id);
+}
+            
             config.cargoAviso =
                 cargo.id;
 
