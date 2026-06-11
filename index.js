@@ -77,88 +77,94 @@ function formatarHorario(timestamp) {
         
 async function atualizarPainel() {
 
-    if (!dados.painel || !dados.canal) {
+    if (!dados.paineis || dados.paineis.length === 0) {
         return;
     }
 
-    try {
+    const embed =
+        new EmbedBuilder()
+            .setTitle('📋 CONTROLE DE ROUBOS')
+            .setColor('Blue')
+            .setTimestamp();
 
-        const canal =
-            await client.channels.fetch(
-                dados.canal
-            );
+    const locais = Object.keys(
+        config.cooldowns
+    );
 
-        const mensagem =
-            await canal.messages.fetch(
-                dados.painel
-            );
+    for (const local of locais) {
 
-        const embed =
-            new EmbedBuilder()
-                .setTitle('📋 CONTROLE DE ROUBOS')
-                .setColor('Blue')
-                .setTimestamp();
+        const info =
+            dados.roubos[local];
 
-        const locais = Object.keys(
-            config.cooldowns
-        );
+        if (!info) {
 
-        for (const local of locais) {
+            embed.addFields({
+                name: local.toUpperCase(),
+                value:
+                '⏰ Disponível às: AGORA\n' +
+                '⌛ Tempo restante: 0min\n' +
+                '🟢 Liberado'
+            });
 
-            const info =
-                dados.roubos[local];
-
-            if (!info) {
-
-                embed.addFields({
-                    name: local.toUpperCase(),
-                    value:
-               '⏰ Disponível às: AGORA\n' +
-               '⌛ Tempo restante: 0min\n' +
-               '🟢 Liberado'
-              });
-
-                continue;
-            }
-
-            const restante =
-                info.libera - Date.now();
-
-            if (restante <= 0) {
-
-                embed.addFields({
-                    name: local.toUpperCase(),
-                    value:
-                 '⏰ Disponível às: AGORA\n' +
-                 '⌛ Tempo restante: 0min\n' +
-                 '🟢 Liberado'
-                });
-
-            } else {
-
-                embed.addFields({
-                    name: local.toUpperCase(),
-                    value:
-                 `⏰ Disponível às: ${formatarHorario(info.libera)}\n` +
-                 `⌛ Tempo restante: ${formatarTempo(restante)}\n` +
-                 `🔴 Em cooldown`
-                });
-
-            }
+            continue;
         }
 
-        await mensagem.edit({
-            embeds: [embed]
-        });
+        const restante =
+            info.libera - Date.now();
 
-    } catch (erro) {
-        console.log(
-            'Erro ao atualizar painel:',
-            erro.message
-        );
+        if (restante <= 0) {
+
+            embed.addFields({
+                name: local.toUpperCase(),
+                value:
+                '⏰ Disponível às: AGORA\n' +
+                '⌛ Tempo restante: 0min\n' +
+                '🟢 Liberado'
+            });
+
+        } else {
+
+            embed.addFields({
+                name: local.toUpperCase(),
+                value:
+                `⏰ Disponível às: ${formatarHorario(info.libera)}\n` +
+                `⌛ Tempo restante: ${formatarTempo(restante)}\n` +
+                `🔴 Em cooldown`
+            });
+
+        }
     }
-}
 
+    for (const painelInfo of dados.paineis) {
+
+        try {
+
+            const canal =
+                await client.channels.fetch(
+                    painelInfo.canal
+                );
+
+            const mensagem =
+                await canal.messages.fetch(
+                    painelInfo.painel
+                );
+
+            await mensagem.edit({
+                embeds: [embed]
+            });
+
+        } catch (erro) {
+
+            console.log(
+                'Erro painel:',
+                erro.message
+            );
+
+        }
+
+    }
+    
+}
 async function verificarLiberacoes() {
 
     let alterou = false;
@@ -176,23 +182,30 @@ async function verificarLiberacoes() {
 
             try {
 
-                const canal =
-                    await client.channels.fetch(
-                        dados.canal
-                    );
+                for (const painelInfo of dados.paineis) {
 
-                await canal.send(
-    `<@&${config.cargoAviso}>\n\n` +
-    `✅ **${local.toUpperCase()}** DISPONÍVEL!\n\n` +
-    `🏦 Já pode ser roubado novamente.`
-);
+    try {
 
-            } catch (erro) {
-                console.log(
-                    'Erro ao avisar:',
-                    erro.message
-                );
-            }
+        const canal =
+            await client.channels.fetch(
+                painelInfo.canal
+            );
+
+        await canal.send(
+            `<@&${config.cargoAviso}>\n\n` +
+            `✅ **${local.toUpperCase()}** DISPONÍVEL!\n\n` +
+            `🏦 Já pode ser roubado novamente.`
+        );
+
+    } catch (erro) {
+
+        console.log(
+            'Erro ao avisar:',
+            erro.message
+        );
+
+     }       
+}
 
             info.avisado = true;
 
