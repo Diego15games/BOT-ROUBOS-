@@ -278,6 +278,29 @@ client.on(
     );
         }
 
+        if (texto.startsWith('resetar ')) {
+
+    const local =
+        texto.replace('resetar ', '');
+
+    if (!config.cooldowns[local]) {
+        return message.reply(
+            '❌ Local não encontrado.'
+        );
+    }
+
+    delete dados.roubos[local];
+
+    salvarDados(dados);
+
+    await atualizarPainel();
+
+    return message.reply(
+        `✅ ${local.toUpperCase()} foi resetado!\n\n` +
+        `🟢 Local liberado imediatamente.`
+    );
+        }
+
         if (!texto.startsWith('up ')) {
             return;
         }
