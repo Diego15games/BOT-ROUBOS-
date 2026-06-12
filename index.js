@@ -235,6 +235,49 @@ client.on(
                 .trim()
                 .toLowerCase();
 
+        if (texto.startsWith('tempo ')) {
+
+    const partes = texto.split(' ');
+
+    const horario = partes.pop();
+
+    const local = partes.slice(1).join(' ');
+
+    if (!config.cooldowns[local]) {
+        return message.reply('❌ Local não encontrado.');
+    }
+
+    const [horas, minutos] =
+        horario.split(':').map(Number);
+
+    if (
+        isNaN(horas) ||
+        isNaN(minutos)
+    ) {
+        return message.reply(
+            '❌ Use: tempo navio 01:30'
+        );
+    }
+
+    const libera =
+        Date.now() +
+        ((horas * 60 + minutos) * 60000);
+
+    dados.roubos[local] = {
+        libera,
+        avisado: false
+    };
+
+    salvarDados(dados);
+
+    await atualizarPainel();
+
+    return message.reply(
+        `✅ Tempo definido para ${local.toUpperCase()}\n` +
+        `⏰ Faltam ${horas}h ${minutos}min`
+    );
+        }
+
         if (!texto.startsWith('up ')) {
             return;
         }
