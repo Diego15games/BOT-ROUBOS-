@@ -274,8 +274,8 @@ client.on(
 
     return message.reply(
     `✅ ${local.toUpperCase()} atualizado!\n\n` +
-    `⌛ Tempo restante: ${horas}h ${minutos}min`
-    `⏰ Disponível às: ${formatarHorario(libera)}\n` +
+    `⌛ Tempo restante: ${horas}h ${minutos}min\n` +
+    `⏰ Disponível às: ${formatarHorario(libera)}`
 );
         }
 
