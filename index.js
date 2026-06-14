@@ -285,8 +285,6 @@ if (texto === 'lista') {
 
 if (texto.startsWith('tempo ')) {
 
-        if (texto.startsWith('tempo ')) {
-
     const partes = texto.split(' ');
 
     const horario = partes.pop();
