@@ -234,6 +234,56 @@ client.on(
             message.content
                 .trim()
                 .toLowerCase();
+        
+if (texto === 'lista') {
+
+    let disponiveis = '';
+    let indisponiveis = '';
+    let indefinidos = '';
+
+    for (const local of Object.keys(config.cooldowns)) {
+
+        const info = dados.roubos[local];
+
+        if (!info) {
+
+            indefinidos +=
+                `⚪ ${local.toUpperCase()}\n`;
+
+            continue;
+        }
+
+        const restante =
+            info.libera - Date.now();
+
+        if (restante <= 0) {
+
+            disponiveis +=
+                `🟢 ${local.toUpperCase()}\n`;
+
+        } else {
+
+            indisponiveis +=
+                `🔴 ${local.toUpperCase()} (${formatarTempo(restante)})\n`;
+
+        }
+    }
+
+    return message.reply(
+        `📋 LISTA DE ROUBOS\n\n` +
+
+        `🟢 DISPONÍVEIS\n` +
+        `${disponiveis || 'Nenhum'}\n\n` +
+
+        `🔴 INDISPONÍVEIS\n` +
+        `${indisponiveis || 'Nenhum'}\n\n` +
+
+        `⚪ INDEFINIDOS\n` +
+        `${indefinidos || 'Nenhum'}`
+    );
+}
+
+if (texto.startsWith('tempo ')) {
 
         if (texto.startsWith('tempo ')) {
 
