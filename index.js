@@ -273,9 +273,10 @@ client.on(
     await atualizarPainel();
 
     return message.reply(
-        `✅ Tempo definido para ${local.toUpperCase()}\n` +
-        `⏰ Faltam ${horas}h ${minutos}min`
-    );
+    `✅ ${local.toUpperCase()} atualizado!\n\n` +
+    `⌛ Tempo restante: ${horas}h ${minutos}min`
+    `⏰ Disponível às: ${formatarHorario(libera)}\n` +
+);
         }
 
         if (texto.startsWith('resetar ')) {
